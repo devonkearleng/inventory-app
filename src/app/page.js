@@ -11,6 +11,7 @@
 //   IconButton,
 //   AppBar,
 //   Toolbar,
+//   CircularProgress,
 // } from "@mui/material";
 // import { firestore } from "@/firebase";
 // import {
@@ -45,12 +46,14 @@
 
 // const Home = () => {
 //   const [inventory, setInventory] = useState([]);
+//   const [loading, setLoading] = useState(true);
 //   const [open, setOpen] = useState(false);
 //   const [itemName, setName] = useState("");
 //   const [itemQuantity, setQuantity] = useState(1);
 
 //   // Update inventory
 //   const updateInventory = async () => {
+//     setLoading(true);
 //     const snapshot = query(collection(firestore, "inventory"));
 //     const docs = await getDocs(snapshot);
 //     const inventoryList = [];
@@ -59,6 +62,7 @@
 //       inventoryList.push({ id: doc.id, ...doc.data() });
 //     });
 //     setInventory(inventoryList);
+//     setLoading(false);
 //   };
 
 //   // Add item
@@ -126,14 +130,6 @@
 //       gap={2}
 //       bgcolor="#f5f5f5"
 //     >
-//       {/* <AppBar position="static" style={{ backgroundColor: "#7c4dff" }}>
-//         <Toolbar>
-//           <Typography variant="h6" color="inherit">
-//             Inventory Management
-//           </Typography>
-//         </Toolbar>
-//       </AppBar> */}
-
 //       <Modal
 //         open={open}
 //         onClose={handleClose}
@@ -200,62 +196,73 @@
 //           </Button>
 //         </Box>
 
-//         <TransitionGroup>
-//           {inventory.length === 0 ? (
-//             <Typography variant="h6" color="#7c4dff" textAlign="center">
-//               No items in inventory. Add an item to get started.
-//             </Typography>
-//           ) : (
-//             inventory.map(({ id, name, quantity }) => (
-//               <CSSTransition key={id} timeout={500} classNames="item">
-//                 <Box
-//                   display="flex"
-//                   justifyContent="space-between"
-//                   alignItems="center"
-//                   bgcolor="#f0f0f0"
-//                   paddingX={3}
-//                   paddingY={2}
-//                   borderRadius={2}
-//                   mb={1} // Add margin between items
-//                 >
-//                   <Typography variant="h6" color="#333" style={{ flex: 1 }}>
-//                     {name
-//                       ? name.charAt(0).toUpperCase() + name.slice(1)
-//                       : "No Name"}
-//                   </Typography>
+//         {loading ? (
+//           <Box
+//             display="flex"
+//             justifyContent="center"
+//             alignItems="center"
+//             height="200px"
+//           >
+//             <CircularProgress />
+//           </Box>
+//         ) : (
+//           <TransitionGroup>
+//             {inventory.length === 0 ? (
+//               <Typography variant="h6" color="#7c4dff" textAlign="center">
+//                 No items in inventory. Add an item to get started.
+//               </Typography>
+//             ) : (
+//               inventory.map(({ id, name, quantity }) => (
+//                 <CSSTransition key={id} timeout={500} classNames="item">
 //                   <Box
 //                     display="flex"
+//                     justifyContent="space-between"
 //                     alignItems="center"
-//                     style={{ width: 150 }}
+//                     bgcolor="#f0f0f0"
+//                     paddingX={3}
+//                     paddingY={2}
+//                     borderRadius={2}
+//                     mb={1} // Add margin between items
 //                   >
-//                     <IconButton
-//                       onClick={() => decrementQuantity(id, quantity)}
-//                       color="primary"
-//                     >
-//                       <RemoveIcon />
-//                     </IconButton>
-//                     <Typography
-//                       variant="h6"
-//                       color="#333"
-//                       style={{ minWidth: 40, textAlign: "center" }}
-//                     >
-//                       {quantity}
+//                     <Typography variant="h6" color="#333" style={{ flex: 1 }}>
+//                       {name
+//                         ? name.charAt(0).toUpperCase() + name.slice(1)
+//                         : "No Name"}
 //                     </Typography>
-//                     <IconButton
-//                       onClick={() => incrementQuantity(id, quantity)}
-//                       color="primary"
+//                     <Box
+//                       display="flex"
+//                       alignItems="center"
+//                       style={{ width: 150 }}
 //                     >
-//                       <AddIcon />
-//                     </IconButton>
-//                     <IconButton onClick={() => deleteItem(id)} color="error">
-//                       <DeleteIcon />
-//                     </IconButton>
+//                       <IconButton
+//                         onClick={() => decrementQuantity(id, quantity)}
+//                         color="primary"
+//                       >
+//                         <RemoveIcon />
+//                       </IconButton>
+//                       <Typography
+//                         variant="h6"
+//                         color="#333"
+//                         style={{ minWidth: 40, textAlign: "center" }}
+//                       >
+//                         {quantity}
+//                       </Typography>
+//                       <IconButton
+//                         onClick={() => incrementQuantity(id, quantity)}
+//                         color="primary"
+//                       >
+//                         <AddIcon />
+//                       </IconButton>
+//                       <IconButton onClick={() => deleteItem(id)} color="error">
+//                         <DeleteIcon />
+//                       </IconButton>
+//                     </Box>
 //                   </Box>
-//                 </Box>
-//               </CSSTransition>
-//             ))
-//           )}
-//         </TransitionGroup>
+//                 </CSSTransition>
+//               ))
+//             )}
+//           </TransitionGroup>
+//         )}
 //       </Box>
 //     </Box>
 //   );
@@ -277,6 +284,8 @@ import {
   AppBar,
   Toolbar,
   CircularProgress,
+  InputBase,
+  Paper,
 } from "@mui/material";
 import { firestore } from "@/firebase";
 import {
@@ -291,6 +300,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import SearchIcon from "@mui/icons-material/Search";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "./page.css"; // Make sure to import the CSS file for animations
 
@@ -315,6 +325,7 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   const [itemName, setName] = useState("");
   const [itemQuantity, setQuantity] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Update inventory
   const updateInventory = async () => {
@@ -383,6 +394,14 @@ const Home = () => {
   useEffect(() => {
     updateInventory();
   }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const filteredInventory = inventory.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <Box
@@ -460,6 +479,21 @@ const Home = () => {
             New Task
           </Button>
         </Box>
+        <Paper
+          component="form"
+          sx={{ p: "2px 4px", display: "flex", alignItems: "center", mb: 2 }}
+        >
+          <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="Search Inventory"
+            inputProps={{ "aria-label": "search inventory" }}
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+          <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+            <SearchIcon />
+          </IconButton>
+        </Paper>
 
         {loading ? (
           <Box
@@ -472,12 +506,12 @@ const Home = () => {
           </Box>
         ) : (
           <TransitionGroup>
-            {inventory.length === 0 ? (
+            {filteredInventory.length === 0 ? (
               <Typography variant="h6" color="#7c4dff" textAlign="center">
-                No items in inventory. Add an item to get started.
+                No items found. Add an item to get started.
               </Typography>
             ) : (
-              inventory.map(({ id, name, quantity }) => (
+              filteredInventory.map(({ id, name, quantity }) => (
                 <CSSTransition key={id} timeout={500} classNames="item">
                   <Box
                     display="flex"
