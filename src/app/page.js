@@ -1,3 +1,220 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import {
+//   Box,
+//   Stack,
+//   Typography,
+//   Button,
+//   Modal,
+//   TextField,
+//   IconButton,
+//   AppBar,
+//   Toolbar,
+// } from "@mui/material";
+// import { firestore } from "@/firebase";
+// import {
+//   collection,
+//   doc,
+//   getDocs,
+//   query,
+//   setDoc,
+//   deleteDoc,
+//   getDoc,
+// } from "firebase/firestore";
+// import DeleteIcon from "@mui/icons-material/Delete";
+// import AddIcon from "@mui/icons-material/Add";
+
+// const modalStyle = {
+//   position: "absolute",
+//   top: "50%",
+//   left: "50%",
+//   transform: "translate(-50%, -50%)",
+//   width: 400,
+//   bgcolor: "white",
+//   border: "2px solid #000",
+//   boxShadow: 24,
+//   p: 4,
+//   display: "flex",
+//   flexDirection: "column",
+//   gap: 3,
+// };
+
+// const Home = () => {
+//   const [inventory, setInventory] = useState([]);
+//   const [open, setOpen] = useState(false);
+//   const [itemName, setName] = useState("");
+//   const [itemQuantity, setQuantity] = useState(1);
+
+//   // Update inventory
+//   const updateInventory = async () => {
+//     const snapshot = query(collection(firestore, "inventory"));
+//     const docs = await getDocs(snapshot);
+//     const inventoryList = [];
+
+//     docs.forEach((doc) => {
+//       inventoryList.push({ id: doc.id, ...doc.data() });
+//     });
+//     setInventory(inventoryList);
+//   };
+
+//   // Add item
+//   const addItem = async () => {
+//     if (itemName.trim() === "") {
+//       alert("Item name cannot be empty");
+//       return;
+//     }
+
+//     const docRef = doc(collection(firestore, "inventory"));
+//     const newItem = {
+//       name: itemName,
+//       quantity: itemQuantity,
+//     };
+
+//     await setDoc(docRef, newItem);
+
+//     setName("");
+//     setQuantity(1);
+//     handleClose();
+//     await updateInventory();
+//   };
+
+//   // Delete item
+//   const deleteItem = async (id) => {
+//     const docRef = doc(firestore, "inventory", id);
+//     await deleteDoc(docRef);
+//     await updateInventory();
+//   };
+
+//   const handleOpen = () => setOpen(true);
+//   const handleClose = () => {
+//     setOpen(false);
+//     setName("");
+//     setQuantity(1);
+//   };
+
+//   useEffect(() => {
+//     updateInventory();
+//   }, []);
+
+//   return (
+//     <Box
+//       width="100vw"
+//       height="100vh"
+//       display="flex"
+//       justifyContent="center"
+//       flexDirection="column"
+//       alignItems="center"
+//       gap={2}
+//       bgcolor="#f5f5f5"
+//     >
+//       {/* <AppBar position="static" style={{ backgroundColor: "#7c4dff" }}>
+//         <Toolbar>
+//           <Typography variant="h6" color="inherit">
+//             Inventory Management
+//           </Typography>
+//         </Toolbar>
+//       </AppBar> */}
+
+//       <Modal
+//         open={open}
+//         onClose={handleClose}
+//         aria-labelledby="modal-modal-title"
+//         aria-describedby="modal-modal-description"
+//       >
+//         <Box sx={modalStyle}>
+//           <Typography id="modal-modal-title" variant="h6" component="h2">
+//             Add Item
+//           </Typography>
+//           <Stack width="100%" direction="row" spacing={2}>
+//             <TextField
+//               id="outlined-basic"
+//               label="Item"
+//               variant="outlined"
+//               fullWidth
+//               value={itemName}
+//               onChange={(e) => setName(e.target.value)}
+//             />
+//             <TextField
+//               id="outlined-basic"
+//               label="Quantity"
+//               variant="outlined"
+//               type="number"
+//               fullWidth
+//               value={itemQuantity}
+//               onChange={(e) => setQuantity(Number(e.target.value))}
+//             />
+//             <Button
+//               variant="contained"
+//               onClick={addItem}
+//               startIcon={<AddIcon />}
+//             >
+//               Add
+//             </Button>
+//           </Stack>
+//         </Box>
+//       </Modal>
+
+//       <Box
+//         mt={3}
+//         p={3}
+//         bgcolor="white"
+//         borderRadius={2}
+//         boxShadow={3}
+//         width="80%"
+//         maxWidth="600px"
+//       >
+//         <Box
+//           display="flex"
+//           justifyContent="space-between"
+//           alignItems="center"
+//           mb={2}
+//         >
+//           <Typography variant="h4" color="#7c4dff">
+//             Inventory Items
+//           </Typography>
+//           <Button
+//             variant="contained"
+//             onClick={handleOpen}
+//             startIcon={<AddIcon />}
+//           >
+//             New Task
+//           </Button>
+//         </Box>
+
+//         <Stack spacing={2}>
+//           {inventory.map(({ id, name, quantity }) => (
+//             <Box
+//               key={id}
+//               display="flex"
+//               justifyContent="space-between"
+//               alignItems="center"
+//               bgcolor="#f0f0f0"
+//               paddingX={3}
+//               paddingY={2}
+//               borderRadius={2}
+//             >
+//               <Typography variant="h6" color="#333">
+//                 {name
+//                   ? name.charAt(0).toUpperCase() + name.slice(1)
+//                   : "No Name"}
+//               </Typography>
+//               <Typography variant="h6" color="#333">
+//                 Quantity: {quantity}
+//               </Typography>
+//               <IconButton onClick={() => deleteItem(id)} color="error">
+//                 <DeleteIcon />
+//               </IconButton>
+//             </Box>
+//           ))}
+//         </Stack>
+//       </Box>
+//     </Box>
+//   );
+// };
+
+// export default Home;
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,6 +225,9 @@ import {
   Button,
   Modal,
   TextField,
+  IconButton,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 import { firestore } from "@/firebase";
 import {
@@ -19,8 +239,11 @@ import {
   deleteDoc,
   getDoc,
 } from "firebase/firestore";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
-const style = {
+const modalStyle = {
   position: "absolute",
   top: "50%",
   left: "50%",
@@ -35,55 +258,73 @@ const style = {
   gap: 3,
 };
 
-export default function Home() {
-  // We'll add our component logic here
-
+const Home = () => {
   const [inventory, setInventory] = useState([]);
   const [open, setOpen] = useState(false);
   const [itemName, setName] = useState("");
+  const [itemQuantity, setQuantity] = useState(1);
 
-  //update
+  // Update inventory
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, "inventory"));
     const docs = await getDocs(snapshot);
     const inventoryList = [];
 
     docs.forEach((doc) => {
-      inventoryList.push({ name: doc.id, ...doc.data() });
+      inventoryList.push({ id: doc.id, ...doc.data() });
     });
     setInventory(inventoryList);
   };
 
-  //add
-  const addItem = async (item) => {
-    const docRef = doc(collection(firestore, "inventory"), item);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const { quantity } = docSnap.data();
-      await setDoc(docRef, { quantity: quantity + 1 });
-    } else {
-      await setDoc(docRef, { quantity: 1 });
+  // Add item
+  const addItem = async () => {
+    if (itemName.trim() === "") {
+      alert("Item name cannot be empty");
+      return;
     }
+
+    const docRef = doc(collection(firestore, "inventory"));
+    const newItem = {
+      name: itemName,
+      quantity: itemQuantity,
+    };
+
+    await setDoc(docRef, newItem);
+
+    setName("");
+    setQuantity(1);
+    handleClose();
     await updateInventory();
   };
 
-  //delete
-  const deleteItem = async (item) => {
-    const docRef = doc(collection(firestore, "inventory"), item);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const { quantity } = docSnap.data();
-      if (quantity == 1) {
-        await deleteDoc(docRef);
-      } else {
-        await setDoc(docRef, { quantity: quantity - 1 });
-      }
-    }
+  // Delete item
+  const deleteItem = async (id) => {
+    const docRef = doc(firestore, "inventory", id);
+    await deleteDoc(docRef);
+    await updateInventory();
+  };
+
+  // Increment quantity
+  const incrementQuantity = async (id, currentQuantity) => {
+    const docRef = doc(firestore, "inventory", id);
+    await setDoc(docRef, { quantity: currentQuantity + 1 }, { merge: true });
+    await updateInventory();
+  };
+
+  // Decrement quantity
+  const decrementQuantity = async (id, currentQuantity) => {
+    if (currentQuantity <= 1) return;
+    const docRef = doc(firestore, "inventory", id);
+    await setDoc(docRef, { quantity: currentQuantity - 1 }, { merge: true });
     await updateInventory();
   };
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setName("");
+    setQuantity(1);
+  };
 
   useEffect(() => {
     updateInventory();
@@ -93,11 +334,12 @@ export default function Home() {
     <Box
       width="100vw"
       height="100vh"
-      display={"flex"}
-      justifyContent={"center"}
-      flexDirection={"column"}
-      alignItems={"center"}
+      display="flex"
+      justifyContent="center"
+      flexDirection="column"
+      alignItems="center"
       gap={2}
+      bgcolor="#f5f5f5"
     >
       <Modal
         open={open}
@@ -105,11 +347,11 @@ export default function Home() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box sx={modalStyle}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Add Item
           </Typography>
-          <Stack width="100%" direction={"row"} spacing={2}>
+          <Stack width="100%" direction="row" spacing={2}>
             <TextField
               id="outlined-basic"
               label="Item"
@@ -118,60 +360,106 @@ export default function Home() {
               value={itemName}
               onChange={(e) => setName(e.target.value)}
             />
-            <Button
+            <TextField
+              id="outlined-basic"
+              label="Quantity"
               variant="outlined"
-              onClick={() => {
-                addItem(itemName);
-                setName("");
-                handleClose();
-              }}
+              type="number"
+              fullWidth
+              value={itemQuantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+            />
+            <Button
+              variant="contained"
+              onClick={addItem}
+              startIcon={<AddIcon />}
             >
               Add
             </Button>
           </Stack>
         </Box>
       </Modal>
-      <Button variant="contained" onClick={handleOpen}>
-        Add New Item
-      </Button>
-      <Box border={"1px solid #333"}>
+
+      <Box
+        mt={3}
+        p={3}
+        bgcolor="white"
+        borderRadius={2}
+        boxShadow={3}
+        width="80%"
+        maxWidth="600px"
+      >
         <Box
-          width="800px"
-          height="100px"
-          bgcolor={"#ADD8E6"}
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
         >
-          <Typography variant={"h2"} color={"#333"} textAlign={"center"}>
+          <Typography variant="h4" color="#7c4dff">
             Inventory Items
           </Typography>
+          <Button
+            variant="contained"
+            onClick={handleOpen}
+            startIcon={<AddIcon />}
+          >
+            New Task
+          </Button>
         </Box>
-        <Stack width="800px" height="300px" spacing={2} overflow={"auto"}>
-          {inventory.map(({ name, quantity }) => (
-            <Box
-              key={name}
-              width="100%"
-              minHeight="150px"
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              bgcolor={"#f0f0f0"}
-              paddingX={5}
-            >
-              <Typography variant={"h3"} color={"#333"} textAlign={"center"}>
-                {name.charAt(0).toUpperCase() + name.slice(1)}
-              </Typography>
-              <Typography variant={"h3"} color={"#333"} textAlign={"center"}>
-                Quantity: {quantity}
-              </Typography>
-              <Button variant="contained" onClick={() => deleteItem(name)}>
-                Remove
-              </Button>
-            </Box>
-          ))}
+
+        <Stack spacing={2}>
+          {inventory.length === 0 ? (
+            <Typography variant="h6" color="#7c4dff" textAlign="center">
+              No items in inventory. Add an item to get started.
+            </Typography>
+          ) : (
+            inventory.map(({ id, name, quantity }) => (
+              <Box
+                key={id}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                bgcolor="#f0f0f0"
+                paddingX={3}
+                paddingY={2}
+                borderRadius={2}
+              >
+                <Typography variant="h6" color="#333" style={{ flex: 1 }}>
+                  {name
+                    ? name.charAt(0).toUpperCase() + name.slice(1)
+                    : "No Name"}
+                </Typography>
+                <Box display="flex" alignItems="center" style={{ width: 150 }}>
+                  <IconButton
+                    onClick={() => decrementQuantity(id, quantity)}
+                    color="primary"
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                  <Typography
+                    variant="h6"
+                    color="#333"
+                    style={{ minWidth: 40, textAlign: "center" }}
+                  >
+                    {quantity}
+                  </Typography>
+                  <IconButton
+                    onClick={() => incrementQuantity(id, quantity)}
+                    color="primary"
+                  >
+                    <AddIcon />
+                  </IconButton>
+                  <IconButton onClick={() => deleteItem(id)} color="error">
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))
+          )}
         </Stack>
       </Box>
     </Box>
   );
-}
+};
+
+export default Home;
