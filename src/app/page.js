@@ -476,7 +476,7 @@ const Home = () => {
             onClick={handleOpen}
             startIcon={<AddIcon />}
           >
-            New Task
+            New Item
           </Button>
         </Box>
         <Paper
