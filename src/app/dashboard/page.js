@@ -48,6 +48,20 @@ const modalStyle = {
   gap: 3,
 };
 
+const recipeModalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "80%",
+  maxWidth: 600,
+  bgcolor: "white", // Keep the background color white
+  color: "black", // Set the text color to black
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
 const Dashboard = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +71,9 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
+  const [recipe, setRecipe] = useState("");
+  const [error, setError] = useState("");
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -136,10 +153,40 @@ const Dashboard = () => {
     try {
       await signOut(auth);
       sessionStorage.removeItem("user");
-      router.push("/");
+      router.push("/landing");
     } catch (error) {
       console.error("Error signing out:", error);
     }
+  };
+
+  const handleGenerateRecipe = async () => {
+    try {
+      setError(""); // Clear any previous errors
+      const response = await fetch("/api/generate-recipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: inventory }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      const data = await response.json();
+      setRecipe(data.recipe);
+      setRecipeModalOpen(true); // Open the recipe modal
+    } catch (error) {
+      console.error("Error generating recipe:", error);
+      setError("Error generating recipe: " + error.message);
+    }
+  };
+
+  const handleRecipeModalClose = () => {
+    setRecipeModalOpen(false);
+    setRecipe("");
   };
 
   const filteredInventory = inventory.filter((item) =>
@@ -158,6 +205,7 @@ const Dashboard = () => {
           </Button>
         </Toolbar>
       </AppBar>
+
       <Modal
         open={open}
         onClose={handleClose}
@@ -315,6 +363,44 @@ const Dashboard = () => {
               )}
             </TransitionGroup>
           )}
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleGenerateRecipe}
+            sx={{ mt: 3 }}
+          >
+            Generate Recipe
+          </Button>
+
+          {error && (
+            <Box mt={3} p={2} bgcolor="#f0f0f0" borderRadius={2}>
+              <Typography variant="body1" color="error">
+                {error}
+              </Typography>
+            </Box>
+          )}
+
+          <Modal
+            open={recipeModalOpen}
+            onClose={handleRecipeModalClose}
+            aria-labelledby="recipe-modal-title"
+            aria-describedby="recipe-modal-description"
+          >
+            <Box sx={recipeModalStyle}>
+              <Typography id="recipe-modal-title" variant="h6" component="h2">
+                Generated Recipe
+              </Typography>
+              <Box
+                id="recipe-modal-description"
+                dangerouslySetInnerHTML={{ __html: recipe }}
+                sx={{ mt: 2 }}
+              />
+              <Button onClick={handleRecipeModalClose} sx={{ mt: 2 }}>
+                Close
+              </Button>
+            </Box>
+          </Modal>
         </Box>
       </Box>
     </Box>
