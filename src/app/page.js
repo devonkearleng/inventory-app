@@ -476,7 +476,7 @@ const Home = () => {
             onClick={handleOpen}
             startIcon={<AddIcon />}
           >
-            New Item
+            NEW ITEM
           </Button>
         </Box>
         <Paper
