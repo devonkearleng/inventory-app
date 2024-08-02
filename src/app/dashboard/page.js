@@ -153,7 +153,7 @@ const Dashboard = () => {
     try {
       await signOut(auth);
       sessionStorage.removeItem("user");
-      router.push("/landing");
+      router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }
